@@ -87,3 +87,9 @@ public:
        
     }
 };
+
+
+// this is multi source bfs
+
+// S.C= O(R*C)
+// T.C= O(R*C)
