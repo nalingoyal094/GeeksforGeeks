@@ -1,106 +1,87 @@
-// naive solution
-// t.c= O(row*col*no._of_words)
-
-class Solution{
-public:
-
-   vector<pair<int,int>>dir={{1,0},{0,1},{-1,0},{0,-1},{-1,-1},{-1,1},{1,1},{1,-1}};
-
-   bool solve1(string s,vector<vector<int >>vis, vector<vector<char> > board,int m,int n,int index,int i,int j )
-   {
-       //cout<<s[index]<<endl;
-       if (index==s.size())
-       {
-           return true;
-       }
-       
-       
-           for (auto p: dir)
-           {
-               int f=i+p.first;
-               int se=j+p.second;
-               
-              // cout<<f<<" "<<se<<endl;
-               //cout<<board[1][0]<<endl;
-               
-               
-               if (f>=0 && f<m && se>=0 && se<n)
-               {
-                   //cout<<"andar"<<f<<se<<endl;
-                   if (board[f][se]==s[index] && vis[f][se]==0)
-                   {
-                 //      cout<<s[index]<<endl;
-                       vis[f][se]=1;
-                       if (solve1(s,vis,board,m,n,index+1,f,se))
-                       {
-                           return true;
-                       }
-                       vis[f][se]=0;
-                   }
-               }
-               
-               
-               
-           }
-           return false;
-       
-       
-       
-       
-       
-   }
-
-    bool solve(string s,vector<vector<int >>vis, vector<vector<char> > board,int m,int n,int index )
+class Solution
+{
+    bool dfsRec(
+                    vector<vector<char>> &board, 
+                    string word, 
+                    vector<vector<bool>> &visited, 
+                    int row, 
+                    int col, 
+                    int wordIndex
+                )
     {
-        if (index==s.size())
+        if(wordIndex == word.size())
         {
             return true;
         }
         
-        for (int i=0;i<m;i++)
+        if(
+                row >= 0 and row < board.size() and 
+                col >= 0 and col < board[0].size() and 
+                visited[row][col] == false and
+                board[row][col] == word[wordIndex]
+            )
         {
-            for (int j=0;j<n;j++)
-            {
-                if (board[i][j]==s[index] && vis[i][j]==0)
+            visited[row][col] = true;
+            
+            if(
+                    dfsRec(board, word, visited, row - 1, col - 1, wordIndex + 1) or
+                    dfsRec(board, word, visited, row - 1, col + 0, wordIndex + 1) or
+                    dfsRec(board, word, visited, row - 1, col + 1, wordIndex + 1) or
+                    dfsRec(board, word, visited, row + 0, col - 1, wordIndex + 1) or
+                    dfsRec(board, word, visited, row + 0, col + 1, wordIndex + 1) or
+                    dfsRec(board, word, visited, row + 1, col - 1, wordIndex + 1) or
+                    dfsRec(board, word, visited, row + 1, col + 0, wordIndex + 1) or
+                    dfsRec(board, word, visited, row + 1, col + 1, wordIndex + 1)
+                )
                 {
-                  //  cout<<s[index]<<endl;
-                   vis[i][j]=1;
-                    
-                    
-                    if (solve1(s,vis,board,m,n,index+1,i,j))
-                       return true;
-                    
-                    vis[i][j]=0;
-                    
-                    
+                    return true;
                 }
-                
+            
+            visited[row][col] = false;
+        }
+        
+        return false;
+    }
+    
+    bool findWords(vector<vector<char>> &board, string word)
+    {
+        int m = board.size();
+        int n = board[0].size();
+        
+        vector<vector<bool>> visited(m, vector<bool> (n, false));
+        
+        int wordIndex = 0;
+        
+        for(int row = 0; row < m; row++)
+        {
+            for(int col = 0; col < n; col++)
+            {
+                if(board[row][col] == word[wordIndex])
+                {
+                    if(dfsRec(board, word, visited, row, col, wordIndex) == true)
+                    {
+                        return true;
+                    }
+                }
             }
         }
-        return false;
         
+        return false;
     }
-      
-
-	vector<string> wordBoggle(vector<vector<char> >& board, vector<string>& dictionary) {
-	    
-	    int m=board.size();
-	    int n=board[0].size();
-	    
-	    vector<vector<int >>vis(m,vector<int>(n,0));
-	    
-	    vector<string>v;
-	    
-	    for (string s: dictionary)
-	    {
-	        if (solve(s,vis,board,m,n,0))
-	        {
-	            v.push_back(s);
-	        }
-	    }
-	    return v;
-	    
-	    
-	    
-	}
+    
+    public:
+    vector<string> wordBoggle(vector<vector<char>> &board, vector<string> &dictionary) 
+    {
+        vector<string> res;
+        
+        for(auto x: dictionary)
+        {
+            if(findWords(board, x))
+            {
+                res.push_back(x);
+            }
+        }
+        
+        return res;
+    }
 };
