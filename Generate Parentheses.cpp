@@ -44,3 +44,7 @@ class Solution
         
     }
 };
+
+
+// t.c= O(2^n)
+// s.c= O(n) for storing output string
